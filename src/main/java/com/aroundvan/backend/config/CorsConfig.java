@@ -30,7 +30,9 @@ public class CorsConfig {
         configuration.setAllowedMethods(List.of(
                 "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
         ));
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:5147"
+        ));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source =
