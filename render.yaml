@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: around-van-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /actuator/health
+    envVars:
+      # Set manually as jdbc:postgresql://HOST:PORT/DB (Render's postgres:// URL is not JDBC)
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: around-van-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: around-van-db
+          property: password
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: validate
+      - key: TICKETMASTER_API_KEY
+        sync: false
+      - key: TICKETMASTER_SECRET_KEY
+        sync: false
+      - key: APP_CORS_ALLOWED_ORIGINS
+        sync: false
+
+databases:
+  - name: around-van-db
+    plan: basic_256mb
+    postgresMajorVersion: "16"
