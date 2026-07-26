@@ -38,11 +38,16 @@ public class EventService {
     }
 
     public List<EventResponse> getUpcomingEventsNearbyForUser(User user) {
+        if (user.getHomeLocation() == null) {
+            throw new IllegalStateException("Set your home location before requesting nearby events");
+        }
 
         return findAllUpcomingEvents()
                 .stream()
                 .filter(event -> event.getLocation() != null)
-                .sorted(Comparator.comparingDouble(event-> locationService.calculateDistanceFromUserInKm(user, event.getLocation()))).map(eventMapper::toResponse).toList();
+                .sorted(Comparator.comparingDouble(event -> locationService.calculateDistanceFromUserInKm(user, event.getLocation())))
+                .map(eventMapper::toResponse)
+                .toList();
     }
 
     public List<EventResponse> getAllPastEvents() {

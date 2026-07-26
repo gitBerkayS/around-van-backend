@@ -2,29 +2,22 @@ package com.aroundvan.backend.api.users;
 
 import com.aroundvan.backend.user.User;
 import com.aroundvan.backend.user.UserDTO;
-import com.aroundvan.backend.user.UserRepository;
+import com.aroundvan.backend.user.UserService;
+import com.aroundvan.backend.user.dto.UpdateLocationRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @GetMapping("/me")
-    public UserDTO getCurrentUser(Authentication authentication) {
-
-        User user = userRepository
-                .findByUsername(authentication.getName())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "User not found"
-                ));
+    public UserDTO getCurrentUser() {
+        User user = userService.getCurrentUser();
 
         return new UserDTO(
                 user.getId(),
@@ -32,5 +25,12 @@ public class UserController {
                 user.getHomeLocation(),
                 user.getEmail()
         );
+    }
+
+    // accepts browser geolocation or manual lat long
+    @PutMapping("/me/location")
+    public UserDTO updateHomeLocation(
+            @Valid @RequestBody UpdateLocationRequest request) {
+        return userService.updateHomeLocation(request);
     }
 }

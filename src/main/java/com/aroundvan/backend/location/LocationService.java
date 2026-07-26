@@ -17,19 +17,22 @@ public class LocationService {
     private final NeighbourhoodService neighbourhoodService;
 
     // Resolves imported coordinates into a persisted Location, reusing the
-    // event's existing Location on re-import so we don't orphan rows.
+    // event's existing Location on re-import so we don't orphan rows
     // Returns null when coordinates are missing so nearby filtering can skip.
-    public Location resolveEventLocation(
-            Location existingLocation,
-            Double latitude,
-            Double longitude
-    ) {
+    public Location resolveEventLocation(Location existingLocation, Double latitude, Double longitude) {
+        return resolveCoordinatesLocation(existingLocation, latitude, longitude);
+    }
+
+    public Location resolveHomeLocation(Location existingLocation, double latitude, double longitude) {
+        return resolveCoordinatesLocation(existingLocation, latitude, longitude);
+    }
+
+    private Location resolveCoordinatesLocation(Location existingLocation, Double latitude, Double longitude) {
         if (latitude == null || longitude == null) {
             return existingLocation;
         }
 
-        Location location =
-                existingLocation != null ? existingLocation : new Location();
+        Location location = existingLocation != null ? existingLocation : new Location();
 
         location.setLatitude(latitude);
         location.setLongitude(longitude);

@@ -40,9 +40,9 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers(
                                 HttpMethod.GET,
-                                "/api/events/upcoming/near",
-                                "/api/users/me"
+                                "/api/events/upcoming/near"
                         ).authenticated()
+                        .requestMatchers("/api/users/**").authenticated()
                         .anyRequest().denyAll()
                 )
                 .oauth2ResourceServer(oauth2 ->
