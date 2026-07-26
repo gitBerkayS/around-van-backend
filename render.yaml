@@ -2,6 +2,7 @@ services:
   - type: web
     name: around-van-backend
     runtime: docker
+    plan: free
     dockerfilePath: ./Dockerfile
     healthCheckPath: /actuator/health
     envVars:
@@ -26,5 +27,5 @@ services:
 
 databases:
   - name: around-van-db
-    plan: basic-256mb
+    plan: free
     postgresMajorVersion: "16"
