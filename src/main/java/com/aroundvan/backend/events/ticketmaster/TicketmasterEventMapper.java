@@ -58,14 +58,29 @@ public class TicketmasterEventMapper {
                 EventProvider.TICKETMASTER,
                 event.id(),
                 event.name(),
+                getDescription(event),
                 event.url(),
                 getStartDate(event),
+                getEndDate(event),
+                getPublishedDate(event),
                 getBestImageUrl(event.images()),
                 venue != null ? venue.name() : null,
                 getCityName(venue),
                 latitude,
                 longitude
         );
+    }
+
+    private String getDescription(TicketmasterEvent event) {
+        if (event.info() != null && !event.info().isBlank()) {
+            return event.info();
+        }
+
+        if (event.pleaseNote() != null && !event.pleaseNote().isBlank()) {
+            return event.pleaseNote();
+        }
+
+        return null;
     }
 
     private Instant getStartDate(TicketmasterEvent event) {
@@ -75,6 +90,24 @@ public class TicketmasterEventMapper {
         }
 
         return event.dates().start().dateTime();
+    }
+
+    private Instant getEndDate(TicketmasterEvent event) {
+        if (event.dates() == null
+                || event.dates().end() == null) {
+            return null;
+        }
+
+        return event.dates().end().dateTime();
+    }
+
+    private Instant getPublishedDate(TicketmasterEvent event) {
+        if (event.sales() == null
+                || event.sales().publicSales() == null) {
+            return null;
+        }
+
+        return event.sales().publicSales().startDateTime();
     }
 
     private Venue getFirstVenue(TicketmasterEvent event) {

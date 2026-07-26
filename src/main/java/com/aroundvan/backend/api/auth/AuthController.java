@@ -1,5 +1,6 @@
-package com.aroundvan.backend.auth;
+package com.aroundvan.backend.api.auth;
 
+import com.aroundvan.backend.auth.AuthService;
 import com.aroundvan.backend.auth.dto.AuthResponse;
 import com.aroundvan.backend.auth.dto.LoginRequest;
 import com.aroundvan.backend.auth.dto.RegisterRequest;
@@ -17,18 +18,14 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(
-            @Valid @RequestBody RegisterRequest request
-    ) {
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(authService.register(request));
     }
 
     @PostMapping("/login")
-    public AuthResponse login(
-            @Valid @RequestBody LoginRequest request
-    ) {
+    public AuthResponse login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
     }
 }

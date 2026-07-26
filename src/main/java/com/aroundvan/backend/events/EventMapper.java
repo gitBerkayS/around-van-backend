@@ -11,6 +11,7 @@ public class EventMapper {
                 event.getId(),
                 event.getTitle(),
                 event.getDescription(),
+                event.getPublishedDate(),
                 event.getDateStart(),
                 event.getDateEnd(),
                 event.getExternalUrl(),

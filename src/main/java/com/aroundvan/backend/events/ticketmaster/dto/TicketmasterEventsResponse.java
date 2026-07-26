@@ -28,7 +28,10 @@ public record TicketmasterEventsResponse(
             String id,
             String name,
             String url,
+            String info,
+            String pleaseNote,
             Dates dates,
+            Sales sales,
             List<Image> images,
 
             @JsonProperty("_embedded")
@@ -38,7 +41,8 @@ public record TicketmasterEventsResponse(
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record Dates(
-            Start start
+            Start start,
+            End end
     ) {
     }
 
@@ -47,6 +51,28 @@ public record TicketmasterEventsResponse(
             LocalDate localDate,
             LocalTime localTime,
             Instant dateTime
+    ) {
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record End(
+            LocalDate localDate,
+            LocalTime localTime,
+            Instant dateTime
+    ) {
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record Sales(
+            @JsonProperty("public")
+            PublicSales publicSales
+    ) {
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record PublicSales(
+            Instant startDateTime,
+            Instant endDateTime
     ) {
     }
 
