@@ -5,7 +5,6 @@ services:
     dockerfilePath: ./Dockerfile
     healthCheckPath: /actuator/health
     envVars:
-      # Set manually as jdbc:postgresql://HOST:PORT/DB (Render's postgres:// URL is not JDBC)
       - key: SPRING_DATASOURCE_URL
         sync: false
       - key: SPRING_DATASOURCE_USERNAME
@@ -27,5 +26,5 @@ services:
 
 databases:
   - name: around-van-db
-    plan: basic_256mb
+    plan: basic-256mb
     postgresMajorVersion: "16"
