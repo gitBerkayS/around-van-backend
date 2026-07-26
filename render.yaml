@@ -22,6 +22,8 @@ services:
         sync: false
       - key: TICKETMASTER_SECRET_KEY
         sync: false
+      - key: METEOSOURCE_API_KEY
+        sync: false
       - key: APP_CORS_ALLOWED_ORIGINS
         sync: false
 

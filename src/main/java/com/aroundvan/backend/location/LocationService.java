@@ -27,6 +27,10 @@ public class LocationService {
         return resolveCoordinatesLocation(existingLocation, latitude, longitude);
     }
 
+    public Location resolveWildfireLocation(Location existingLocation, Double latitude, Double longitude) {
+        return resolveCoordinatesLocation(existingLocation, latitude, longitude);
+    }
+
     private Location resolveCoordinatesLocation(Location existingLocation, Double latitude, Double longitude) {
         if (latitude == null || longitude == null) {
             return existingLocation;

@@ -1,5 +1,6 @@
 package com.aroundvan.backend.location.neighbourhood;
 
+import com.aroundvan.backend.environment.aqhi.AqhiRegion;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,4 +24,8 @@ public class Neighbourhood {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Municipality municipality;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "aqhi_region_location_id")
+    private AqhiRegion aqhiRegion;
 }

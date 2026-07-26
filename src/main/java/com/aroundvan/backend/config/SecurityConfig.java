@@ -35,13 +35,18 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers(
                                 HttpMethod.GET,
-                                "/api/events/upcoming",
-                                "/api/events/past"
-                        ).permitAll()
+                                "/api/events/upcoming/near",
+                                "/api/wildfires/active/near",
+                                "/api/wildfires/fire-weather/near",
+                                "/api/aqhi/current",
+                                "/api/weather/current"
+                        ).authenticated()
                         .requestMatchers(
                                 HttpMethod.GET,
-                                "/api/events/upcoming/near"
-                        ).authenticated()
+                                "/api/events/upcoming",
+                                "/api/events/past",
+                                "/api/wildfires/active"
+                        ).permitAll()
                         .requestMatchers("/api/users/**").authenticated()
                         .anyRequest().denyAll()
                 )
