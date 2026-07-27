@@ -1,6 +1,7 @@
 package com.aroundvan.backend.gas;
 
 import com.aroundvan.backend.gas.dto.GasImportRequest;
+import com.aroundvan.backend.gas.dto.GasImportResult;
 import com.aroundvan.backend.location.Location;
 import com.aroundvan.backend.location.LocationService;
 import lombok.RequiredArgsConstructor;
@@ -12,35 +13,47 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.HexFormat;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 public class GasImportService {
+
+    // GasBuddy often glues street + city: "1675 Rupert StVancouver, BC"
+    private static final Pattern GLUED_CITY = Pattern.compile(
+            "(?i)([^\\s,])((?:North |West )?Vancouver|Burnaby|Richmond|Coquitlam|Port Moody|Port Coquitlam),\\s*BC"
+    );
 
     private final GasStationRepository gasStationRepository;
     private final GasPriceRepository gasPriceRepository;
     private final LocationService locationService;
 
     @Transactional
-    public int importStations(GasImportRequest request) {
+    public GasImportResult importStations(GasImportRequest request) {
         String postalPrefix = LocationService.normalizePostalCodePrefix(request.postalCodePrefix());
         Instant syncedAt = Instant.now();
         int imported = 0;
+        int skipped = 0;
 
         for (GasImportRequest.Station stationData : request.stations()) {
-            String externalKey = buildExternalKey(
-                    postalPrefix,
-                    stationData.name(),
-                    stationData.address()
-            );
+            String name = stationData.name().trim();
+            String address = normalizeAddress(stationData.address());
+
+            if (!isVancouverProper(address)) {
+                skipped++;
+                continue;
+            }
+
+            String externalKey = buildExternalKey(name, address);
 
             GasStation station = gasStationRepository
                     .findByExternalKey(externalKey)
                     .orElseGet(GasStation::new);
 
             station.setExternalKey(externalKey);
-            station.setName(stationData.name().trim());
-            station.setAddress(stationData.address().trim());
+            station.setName(name);
+            station.setAddress(address);
             station.setPostalCodePrefix(postalPrefix);
             station.setLastSyncedAt(syncedAt);
 
@@ -71,11 +84,34 @@ public class GasImportService {
             imported++;
         }
 
-        return imported;
+        return new GasImportResult(imported, skipped);
     }
 
-    private String buildExternalKey(String postalPrefix, String name, String address) {
-        String raw = postalPrefix + "|" + name.trim().toLowerCase() + "|" + address.trim().toLowerCase();
+    static String normalizeAddress(String address) {
+        if (address == null || address.isBlank()) {
+            return address;
+        }
+
+        String cleaned = address.trim().replaceAll("\\s+", " ");
+        return GLUED_CITY.matcher(cleaned).replaceAll("$1, $2, BC");
+    }
+
+    static boolean isVancouverProper(String address) {
+        if (address == null || address.isBlank()) {
+            return false;
+        }
+
+        String normalized = address.toLowerCase(Locale.ROOT);
+
+        if (normalized.contains("north vancouver") || normalized.contains("west vancouver")) {
+            return false;
+        }
+
+        return normalized.contains("vancouver, bc");
+    }
+
+    private String buildExternalKey(String name, String address) {
+        String raw = name.trim().toLowerCase(Locale.ROOT) + "|" + address.trim().toLowerCase(Locale.ROOT);
 
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");

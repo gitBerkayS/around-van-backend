@@ -4,6 +4,7 @@ import com.aroundvan.backend.gas.FuelType;
 import com.aroundvan.backend.gas.GasImportService;
 import com.aroundvan.backend.gas.GasService;
 import com.aroundvan.backend.gas.dto.GasImportRequest;
+import com.aroundvan.backend.gas.dto.GasImportResult;
 import com.aroundvan.backend.gas.dto.GasStationResponse;
 import com.aroundvan.backend.user.User;
 import com.aroundvan.backend.user.UserService;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/gas")
@@ -44,9 +44,8 @@ public class GasController {
     }
 
     @PostMapping("/import")
-    public Map<String, Integer> importStations(@Valid @RequestBody GasImportRequest request) {
-        int imported = gasImportService.importStations(request);
-        return Map.of("imported", imported);
+    public GasImportResult importStations(@Valid @RequestBody GasImportRequest request) {
+        return gasImportService.importStations(request);
     }
 
     private User requireUserWithHomeLocation() {
