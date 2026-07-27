@@ -9,7 +9,9 @@ import com.aroundvan.backend.location.Location;
 import com.aroundvan.backend.location.neighbourhood.Neighbourhood;
 import com.aroundvan.backend.location.neighbourhood.NeighbourhoodService;
 import com.aroundvan.backend.user.User;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -65,7 +67,10 @@ public class WeatherService {
                 meteosourceClient.fetchCurrentWeather(roundedLatitude, roundedLongitude);
 
         if (response == null || response.current() == null) {
-            throw new IllegalStateException("Weather is unavailable for this location");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    "Weather is unavailable for this location"
+            );
         }
 
         WeatherResponse weather = toResponse(response, roundedLatitude, roundedLongitude);
