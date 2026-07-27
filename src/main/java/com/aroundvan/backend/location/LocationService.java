@@ -23,12 +23,46 @@ public class LocationService {
         return resolveCoordinatesLocation(existingLocation, latitude, longitude);
     }
 
+    public Location resolveHomeLocation(
+            Location existingLocation,
+            double latitude,
+            double longitude,
+            String postalCodePrefix
+    ) {
+        Location location = resolveCoordinatesLocation(existingLocation, latitude, longitude);
+
+        if (location != null && postalCodePrefix != null && !postalCodePrefix.isBlank()) {
+            location.setPostalCodePrefix(normalizePostalCodePrefix(postalCodePrefix));
+            return locationRepository.save(location);
+        }
+
+        return location;
+    }
+
     public Location resolveHomeLocation(Location existingLocation, double latitude, double longitude) {
         return resolveCoordinatesLocation(existingLocation, latitude, longitude);
     }
 
     public Location resolveWildfireLocation(Location existingLocation, Double latitude, Double longitude) {
         return resolveCoordinatesLocation(existingLocation, latitude, longitude);
+    }
+
+    public Location resolveGasStationLocation(
+            Location existingLocation,
+            Double latitude,
+            Double longitude
+    ) {
+        return resolveCoordinatesLocation(existingLocation, latitude, longitude);
+    }
+
+    public static String normalizePostalCodePrefix(String postalCode) {
+        String compact = postalCode.replaceAll("\\s+", "").toUpperCase();
+
+        if (compact.length() < 3) {
+            return compact;
+        }
+
+        return compact.substring(0, 3);
     }
 
     private Location resolveCoordinatesLocation(Location existingLocation, Double latitude, Double longitude) {

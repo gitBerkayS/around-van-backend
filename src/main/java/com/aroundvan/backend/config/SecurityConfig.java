@@ -43,8 +43,11 @@ public class SecurityConfig {
                                 "/api/wildfires/active/near",
                                 "/api/wildfires/fire-weather/near",
                                 "/api/aqhi/current",
-                                "/api/weather/current"
+                                "/api/weather/current",
+                                "/api/gas/near",
+                                "/api/gas/cheapest"
                         ).authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/gas/import").authenticated()
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/events/upcoming",

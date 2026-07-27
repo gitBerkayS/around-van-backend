@@ -1,7 +1,9 @@
 package com.aroundvan.backend.user;
 
+import com.aroundvan.backend.gas.FuelType;
 import com.aroundvan.backend.location.Location;
 import com.aroundvan.backend.location.LocationService;
+import com.aroundvan.backend.user.dto.UpdateFuelPreferenceRequest;
 import com.aroundvan.backend.user.dto.UpdateLocationRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
@@ -45,17 +47,33 @@ public class UserService {
         Location homeLocation = locationService.resolveHomeLocation(
                 user.getHomeLocation(),
                 request.latitude(),
-                request.longitude()
+                request.longitude(),
+                request.postalCodePrefix()
         );
 
         user.setHomeLocation(homeLocation);
         userRepository.save(user);
 
+        return toDto(user);
+    }
+
+    @Transactional
+    public UserDTO updateFuelPreference(UpdateFuelPreferenceRequest request) {
+        User user = getCurrentUser();
+        user.setPreferredFuelType(request.fuelType());
+        userRepository.save(user);
+        return toDto(user);
+    }
+
+    private UserDTO toDto(User user) {
         return new UserDTO(
                 user.getId(),
                 user.getUsername(),
                 user.getHomeLocation(),
-                user.getEmail()
+                user.getEmail(),
+                user.getPreferredFuelType() != null
+                        ? user.getPreferredFuelType()
+                        : FuelType.REGULAR
         );
     }
 }

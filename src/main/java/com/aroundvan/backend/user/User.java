@@ -1,5 +1,6 @@
 package com.aroundvan.backend.user;
 
+import com.aroundvan.backend.gas.FuelType;
 import com.aroundvan.backend.location.Location;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -32,6 +33,10 @@ public class User implements UserDetails {
 
     @OneToOne(fetch = FetchType.LAZY)
     private Location homeLocation;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "preferred_fuel_type", nullable = false, length = 20)
+    private FuelType preferredFuelType = FuelType.REGULAR;
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return new ArrayList<>();
