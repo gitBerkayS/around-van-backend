@@ -1,5 +1,6 @@
 package com.aroundvan.backend.config;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,6 +12,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 public class SecurityConfig {
@@ -33,6 +35,8 @@ public class SecurityConfig {
                                 "/actuator/health",
                                 "/error"
                         ).permitAll()
+                        .requestMatchers(weatherCurrentWithCoordinates())
+                        .permitAll()
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/events/upcoming/near",
@@ -54,6 +58,14 @@ public class SecurityConfig {
                         oauth2.jwt(Customizer.withDefaults())
                 )
                 .build();
+    }
+
+    private static RequestMatcher weatherCurrentWithCoordinates() {
+        return (HttpServletRequest request) ->
+                HttpMethod.GET.matches(request.getMethod())
+                        && "/api/weather/current".equals(request.getRequestURI())
+                        && request.getParameter("latitude") != null
+                        && request.getParameter("longitude") != null;
     }
 
     @Bean

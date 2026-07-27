@@ -28,6 +28,6 @@ public record BcwsFireWeatherProperties(
     }
 
     public int cacheMinutesOrDefault() {
-        return cacheMinutes == null || cacheMinutes <= 0 ? 15 : cacheMinutes;
+        return cacheMinutes == null || cacheMinutes <= 0 ? 60 : cacheMinutes;
     }
 }
