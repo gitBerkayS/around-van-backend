@@ -12,19 +12,19 @@ public record BcwsFireWeatherProperties(
         Integer cacheMinutes
 ) {
     public int defaultRadiusKmOrDefault() {
-        return defaultRadiusKm == null || defaultRadiusKm <= 0 ? 100 : defaultRadiusKm;
+        return defaultRadiusKm == null || defaultRadiusKm <= 0 ? 25 : defaultRadiusKm;
     }
 
     public int maxRadiusKmOrDefault() {
-        return maxRadiusKm == null || maxRadiusKm <= 0 ? 300 : maxRadiusKm;
+        return maxRadiusKm == null || maxRadiusKm <= 0 ? 100 : maxRadiusKm;
     }
 
     public int lookbackDaysOrDefault() {
-        return lookbackDays == null || lookbackDays <= 0 ? 3 : lookbackDays;
+        return lookbackDays == null || lookbackDays <= 0 ? 1 : lookbackDays;
     }
 
     public int pageRowCountOrDefault() {
-        return pageRowCount == null || pageRowCount <= 0 ? 200 : pageRowCount;
+        return pageRowCount == null || pageRowCount <= 0 ? 50 : pageRowCount;
     }
 
     public int cacheMinutesOrDefault() {
