@@ -1,6 +1,5 @@
 package com.aroundvan.backend.api.users;
 
-import com.aroundvan.backend.user.User;
 import com.aroundvan.backend.user.UserDTO;
 import com.aroundvan.backend.user.UserService;
 import com.aroundvan.backend.user.dto.UpdateFuelPreferenceRequest;
@@ -18,15 +17,7 @@ public class UserController {
 
     @GetMapping("/me")
     public UserDTO getCurrentUser() {
-        User user = userService.getCurrentUser();
-
-        return new UserDTO(
-                user.getId(),
-                user.getUsername(),
-                user.getHomeLocation(),
-                user.getEmail(),
-                user.getPreferredFuelType()
-        );
+        return userService.toDto(userService.getCurrentUser());
     }
 
     @PutMapping("/me/location")

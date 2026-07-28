@@ -13,17 +13,34 @@ public interface NeighbourhoodRepository extends JpaRepository<Neighbourhood, Lo
 
     @Query(
             value = """
-                    SELECT *
+                    SELECT id
                     FROM neighbourhood
                     WHERE ST_Contains(
-                            boundary,
+                            ST_CollectionExtract(boundary, 3),
                             ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)
                     )
                     LIMIT 1
                     """,
             nativeQuery = true
     )
-    Optional<Neighbourhood> findByCoordinates(
+    Optional<Long> findIdByCoordinates(
+            @Param("latitude") double latitude,
+            @Param("longitude") double longitude
+    );
+
+    @Query(
+            value = """
+                    SELECT name
+                    FROM neighbourhood
+                    WHERE ST_Contains(
+                            ST_CollectionExtract(boundary, 3),
+                            ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)
+                    )
+                    LIMIT 1
+                    """,
+            nativeQuery = true
+    )
+    Optional<String> findNameByCoordinates(
             @Param("latitude") double latitude,
             @Param("longitude") double longitude
     );

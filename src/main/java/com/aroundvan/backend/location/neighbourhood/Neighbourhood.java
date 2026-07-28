@@ -1,6 +1,7 @@
 package com.aroundvan.backend.location.neighbourhood;
 
 import com.aroundvan.backend.environment.aqhi.AqhiRegion;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ public class Neighbourhood {
 
     private String name;
 
+    @JsonIgnore
     @Column(nullable = false, columnDefinition = "geometry(Polygon,4326)")
     private Polygon boundary;
 

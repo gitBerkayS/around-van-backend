@@ -14,10 +14,20 @@ public class NeighbourhoodService {
     // Finds the neighbourhood whose boundary polygon contains the point.
     // Points outside every seeded boundary (e.g. venues in other
     // municipalities) return empty rather than a made-up neighbourhood.
+    // Uses a proxy reference so polygon geometry is never loaded into memory.
     public Optional<Neighbourhood> findByCoordinates(
             double latitude,
             double longitude
     ) {
-        return neighbourhoodRepository.findByCoordinates(latitude, longitude);
+        return neighbourhoodRepository
+                .findIdByCoordinates(latitude, longitude)
+                .map(neighbourhoodRepository::getReferenceById);
+    }
+
+    public Optional<String> findNameByCoordinates(
+            double latitude,
+            double longitude
+    ) {
+        return neighbourhoodRepository.findNameByCoordinates(latitude, longitude);
     }
 }

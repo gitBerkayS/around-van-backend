@@ -1,6 +1,7 @@
 package com.aroundvan.backend.location;
 
 import com.aroundvan.backend.location.neighbourhood.Neighbourhood;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -18,7 +19,8 @@ public class Location {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "neighbourhood_id")
     private Neighbourhood neighbourhood;
     @DecimalMin("-90.0")

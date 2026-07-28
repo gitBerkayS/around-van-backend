@@ -6,7 +6,6 @@ import com.aroundvan.backend.environment.weather.meteosource.MeteosourceClient;
 import com.aroundvan.backend.environment.weather.meteosource.MeteosourceProperties;
 import com.aroundvan.backend.environment.weather.meteosource.dto.MeteosourcePointResponse;
 import com.aroundvan.backend.location.Location;
-import com.aroundvan.backend.location.neighbourhood.Neighbourhood;
 import com.aroundvan.backend.location.neighbourhood.NeighbourhoodService;
 import com.aroundvan.backend.user.User;
 import org.springframework.http.HttpStatus;
@@ -90,8 +89,7 @@ public class WeatherService {
         MeteosourcePointResponse.Precipitation precipitation = current.precipitation();
 
         String neighbourhoodName = neighbourhoodService
-                .findByCoordinates(latitude, longitude)
-                .map(Neighbourhood::getName)
+                .findNameByCoordinates(latitude, longitude)
                 .orElse(null);
 
         return new WeatherResponse(

@@ -2,6 +2,7 @@ package com.aroundvan.backend.user;
 
 import com.aroundvan.backend.gas.FuelType;
 import com.aroundvan.backend.location.Location;
+import com.aroundvan.backend.location.dto.LocationDTO;
 import com.aroundvan.backend.location.LocationService;
 import com.aroundvan.backend.user.dto.UpdateFuelPreferenceRequest;
 import com.aroundvan.backend.user.dto.UpdateLocationRequest;
@@ -65,11 +66,11 @@ public class UserService {
         return toDto(user);
     }
 
-    private UserDTO toDto(User user) {
+    public UserDTO toDto(User user) {
         return new UserDTO(
                 user.getId(),
                 user.getUsername(),
-                user.getHomeLocation(),
+                LocationDTO.from(user.getHomeLocation()),
                 user.getEmail(),
                 user.getPreferredFuelType() != null
                         ? user.getPreferredFuelType()
