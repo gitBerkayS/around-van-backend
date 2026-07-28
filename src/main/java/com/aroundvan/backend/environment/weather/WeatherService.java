@@ -58,39 +58,39 @@ public class WeatherService {
 
         Optional<WeatherResponse> cached = forecastCache.get(cacheKey);
 
-        if (cached.isPresent()) {
-            return cached.get();
-        }
+        WeatherResponse weather = cached.orElseGet(() -> {
+            MeteosourcePointResponse response =
+                    meteosourceClient.fetchCurrentWeather(roundedLatitude, roundedLongitude);
 
-        MeteosourcePointResponse response =
-                meteosourceClient.fetchCurrentWeather(roundedLatitude, roundedLongitude);
+            if (response == null || response.current() == null) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_GATEWAY,
+                        "Weather is unavailable for this location"
+                );
+            }
 
-        if (response == null || response.current() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_GATEWAY,
-                    "Weather is unavailable for this location"
-            );
-        }
 
-        WeatherResponse weather = toResponse(response, roundedLatitude, roundedLongitude);
+            WeatherResponse fetched = toResponse(response, roundedLatitude, roundedLongitude, null);
+            forecastCache.put(cacheKey, fetched);
+            return fetched;
+        });
 
-        forecastCache.put(cacheKey, weather);
+        String neighbourhoodName = neighbourhoodService
+                .findNameByCoordinates(latitude, longitude)
+                .orElse(null);
 
-        return weather;
+        return withNeighbourhood(weather, neighbourhoodName);
     }
 
     private WeatherResponse toResponse(
             MeteosourcePointResponse response,
             double latitude,
-            double longitude
+            double longitude,
+            String neighbourhoodName
     ) {
         MeteosourcePointResponse.Current current = response.current();
         MeteosourcePointResponse.Wind wind = current.wind();
         MeteosourcePointResponse.Precipitation precipitation = current.precipitation();
-
-        String neighbourhoodName = neighbourhoodService
-                .findNameByCoordinates(latitude, longitude)
-                .orElse(null);
 
         return new WeatherResponse(
                 latitude,
@@ -112,6 +112,33 @@ public class WeatherService {
                 current.cloudCoverPercent(),
                 response.units() != null ? response.units() : meteosourceProperties.unitsOrDefault(),
                 Instant.now()
+        );
+    }
+
+    private WeatherResponse withNeighbourhood(
+            WeatherResponse weather,
+            String neighbourhoodName
+    ) {
+        return new WeatherResponse(
+                weather.latitude(),
+                weather.longitude(),
+                neighbourhoodName,
+                weather.summary(),
+                weather.icon(),
+                weather.iconNumber(),
+                weather.temperature(),
+                weather.feelsLike(),
+                weather.humidity(),
+                weather.pressure(),
+                weather.uvIndex(),
+                weather.windSpeed(),
+                weather.windAngle(),
+                weather.windDirection(),
+                weather.precipitation(),
+                weather.precipitationType(),
+                weather.cloudCoverPercent(),
+                weather.units(),
+                weather.fetchedAt()
         );
     }
 
