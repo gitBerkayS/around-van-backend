@@ -24,6 +24,8 @@ services:
         sync: false
       - key: METEOSOURCE_API_KEY
         sync: false
+      - key: NOMINATIM_EMAIL
+        sync: false
       - key: APP_CORS_ALLOWED_ORIGINS
         sync: false
 

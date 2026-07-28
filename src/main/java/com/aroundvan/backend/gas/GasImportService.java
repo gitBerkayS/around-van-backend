@@ -2,6 +2,7 @@ package com.aroundvan.backend.gas;
 
 import com.aroundvan.backend.gas.dto.GasImportRequest;
 import com.aroundvan.backend.gas.dto.GasImportResult;
+import com.aroundvan.backend.gas.geocoding.nominatim.NominatimClient;
 import com.aroundvan.backend.location.Location;
 import com.aroundvan.backend.location.LocationService;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,6 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class GasImportService {
 
-    // GasBuddy often glues street + city: "1675 Rupert StVancouver, BC"
     private static final Pattern GLUED_CITY = Pattern.compile(
             "(?i)([^\\s,])((?:North |West )?Vancouver|Burnaby|Richmond|Coquitlam|Port Moody|Port Coquitlam),\\s*BC"
     );
@@ -28,6 +28,7 @@ public class GasImportService {
     private final GasStationRepository gasStationRepository;
     private final GasPriceRepository gasPriceRepository;
     private final LocationService locationService;
+    private final NominatimClient nominatimClient;
 
     @Transactional
     public GasImportResult importStations(GasImportRequest request) {
@@ -57,11 +58,22 @@ public class GasImportService {
             station.setPostalCodePrefix(postalPrefix);
             station.setLastSyncedAt(syncedAt);
 
-            if (stationData.latitude() != null && stationData.longitude() != null) {
+            Double latitude = stationData.latitude();
+            Double longitude = stationData.longitude();
+
+            if (latitude == null || longitude == null) {
+                var geocoded = nominatimClient.geocode(address);
+                if (geocoded.isPresent()) {
+                    latitude = geocoded.get().latitude();
+                    longitude = geocoded.get().longitude();
+                }
+            }
+
+            if (latitude != null && longitude != null) {
                 Location location = locationService.resolveGasStationLocation(
                         station.getLocation(),
-                        stationData.latitude(),
-                        stationData.longitude()
+                        latitude,
+                        longitude
                 );
                 station.setLocation(location);
             }
