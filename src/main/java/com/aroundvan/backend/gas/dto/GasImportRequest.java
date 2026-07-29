@@ -19,8 +19,7 @@ public record GasImportRequest(
         FuelType fuelType,
 
         @NotEmpty
-        @Valid
-        List<Station> stations
+        List<@Valid Station> stations
 ) {
 
     public record Station(

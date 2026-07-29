@@ -55,6 +55,14 @@ public class LocationService {
         return resolveCoordinatesLocation(existingLocation, latitude, longitude);
     }
 
+    public Location resolveServiceRequestLocation(
+            Location existingLocation,
+            Double latitude,
+            Double longitude
+    ) {
+        return resolveCoordinatesLocation(existingLocation, latitude, longitude);
+    }
+
     public static String normalizePostalCodePrefix(String postalCode) {
         String compact = postalCode.replaceAll("\\s+", "").toUpperCase();
 
