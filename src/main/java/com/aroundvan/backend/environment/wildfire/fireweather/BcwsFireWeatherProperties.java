@@ -20,7 +20,7 @@ public record BcwsFireWeatherProperties(
     }
 
     public int lookbackDaysOrDefault() {
-        return lookbackDays == null || lookbackDays <= 0 ? 1 : lookbackDays;
+        return lookbackDays == null || lookbackDays <= 0 ? 3 : lookbackDays;
     }
 
     public int pageRowCountOrDefault() {

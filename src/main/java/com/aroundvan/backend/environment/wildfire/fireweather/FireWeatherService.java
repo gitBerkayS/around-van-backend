@@ -89,7 +89,9 @@ public class FireWeatherService {
                 ))
                 .toList();
 
-        readingCache.put(cacheKey, readings);
+        if (!readings.isEmpty()) {
+            readingCache.put(cacheKey, readings);
+        }
 
         return readings;
     }
