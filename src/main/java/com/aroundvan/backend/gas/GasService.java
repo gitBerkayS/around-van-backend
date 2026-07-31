@@ -8,8 +8,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -55,8 +58,19 @@ public class GasService {
             FuelType fuelType,
             double radiusKm
     ) {
-        return gasPriceRepository.findAllByFuelTypeWithStationLocation(fuelType)
-                .stream()
+        List<GasPrice> prices = gasPriceRepository.findAllByFuelTypeWithStationLocation(fuelType);
+
+        Instant latestObservedDay = prices.stream()
+                .map(GasPrice::getObservedAt)
+                .filter(Objects::nonNull)
+                .map(observedAt -> observedAt.truncatedTo(ChronoUnit.DAYS))
+                .max(Comparator.naturalOrder())
+                .orElse(null);
+
+        return prices.stream()
+                .filter(price -> latestObservedDay == null
+                        || (price.getObservedAt() != null
+                        && price.getObservedAt().truncatedTo(ChronoUnit.DAYS).equals(latestObservedDay)))
                 .map(price -> toResponse(price, user))
                 .filter(response -> response.distanceKm() != null && response.distanceKm() <= radiusKm)
                 .toList();
