@@ -38,14 +38,16 @@ public class AuthService {
     @Transactional
     public MessageResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.username())) {
-            throw new IllegalArgumentException(
-                    "Username is already being used"
+            throw new FieldTakenException(
+                    "username",
+                    "Username is already taken"
             );
         }
 
         if (userRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException(
-                    "Email is already being used"
+            throw new FieldTakenException(
+                    "email",
+                    "Email is already taken"
             );
         }
 
