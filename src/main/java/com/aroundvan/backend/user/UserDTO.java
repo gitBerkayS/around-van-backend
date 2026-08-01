@@ -8,6 +8,7 @@ public record UserDTO(
         String username,
         LocationDTO location,
         String email,
+        boolean emailVerified,
         FuelType preferredFuelType
 ) {
 }

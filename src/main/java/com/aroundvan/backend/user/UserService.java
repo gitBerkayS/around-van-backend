@@ -72,6 +72,7 @@ public class UserService {
                 user.getUsername(),
                 LocationDTO.from(user.getHomeLocation()),
                 user.getEmail(),
+                user.isEmailVerified(),
                 user.getPreferredFuelType() != null
                         ? user.getPreferredFuelType()
                         : FuelType.REGULAR
