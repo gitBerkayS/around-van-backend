@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -33,6 +34,9 @@ public class User implements UserDetails {
 
     @Column(name = "email_verified", nullable = false)
     private boolean emailVerified = false;
+
+    @Column(name = "last_active_at")
+    private Instant lastActiveAt;
 
     @OneToOne(fetch = FetchType.LAZY)
     private Location homeLocation;

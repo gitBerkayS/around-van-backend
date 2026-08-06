@@ -9,6 +9,7 @@ import com.aroundvan.backend.auth.dto.ResetPasswordRequest;
 import com.aroundvan.backend.auth.dto.TokenRequest;
 import com.aroundvan.backend.mail.EmailService;
 import com.aroundvan.backend.mail.ResendProperties;
+import com.aroundvan.backend.usage.UsageTrackingService;
 import com.aroundvan.backend.user.User;
 import com.aroundvan.backend.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class AuthService {
     private final AuthEmailTokenService authEmailTokenService;
     private final EmailService emailService;
     private final ResendProperties resendProperties;
+    private final UsageTrackingService usageTrackingService;
 
     @Transactional
     public MessageResponse register(RegisterRequest request) {
@@ -58,6 +60,7 @@ public class AuthService {
         user.setEmailVerified(false);
 
         userRepository.save(user);
+        usageTrackingService.markRegister(user.getId(), user.getUsername());
 
         String rawToken = authEmailTokenService.issueToken(
                 user,
@@ -94,6 +97,7 @@ public class AuthService {
         }
 
         String token = tokenService.createToken(authentication.getName());
+        usageTrackingService.markLogin(user.getId(), user.getUsername());
         return new AuthResponse(token);
     }
 
@@ -106,6 +110,7 @@ public class AuthService {
 
         user.setEmailVerified(true);
         userRepository.save(user);
+        usageTrackingService.markEmailConfirmed(user.getId(), user.getUsername());
 
         return new AuthResponse(tokenService.createToken(user.getUsername()));
     }
@@ -140,6 +145,7 @@ public class AuthService {
 
         user.setPassword(passwordEncoder.encode(request.password()));
         userRepository.save(user);
+        usageTrackingService.markPasswordReset(user.getId(), user.getUsername());
 
         return new MessageResponse("Password updated. You can log in with your new password");
     }
