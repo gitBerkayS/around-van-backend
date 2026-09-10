@@ -3,9 +3,11 @@ package com.aroundvan.backend.api.gas;
 import com.aroundvan.backend.gas.FuelType;
 import com.aroundvan.backend.gas.GasImportService;
 import com.aroundvan.backend.gas.GasService;
+import com.aroundvan.backend.gas.GasTrendService;
 import com.aroundvan.backend.gas.dto.GasImportRequest;
 import com.aroundvan.backend.gas.dto.GasImportResult;
 import com.aroundvan.backend.gas.dto.GasStationResponse;
+import com.aroundvan.backend.gas.dto.GasTrendResponse;
 import com.aroundvan.backend.user.User;
 import com.aroundvan.backend.user.UserService;
 import jakarta.validation.Valid;
@@ -22,6 +24,7 @@ import java.util.List;
 public class GasController {
 
     private final GasService gasService;
+    private final GasTrendService gasTrendService;
     private final GasImportService gasImportService;
     private final UserService userService;
 
@@ -41,6 +44,12 @@ public class GasController {
     ) {
         User user = requireUserWithHomeLocation();
         return gasService.getCheapestStations(user, fuelType, limit);
+    }
+
+    @GetMapping("/trend")
+    public GasTrendResponse getTrend(@RequestParam(required = false) FuelType fuelType) {
+        User user = userService.getCurrentUser();
+        return gasTrendService.getTrend(user, fuelType);
     }
 
     @PostMapping("/import")

@@ -50,6 +50,7 @@ public class SecurityConfig {
                                 "/api/weather/current",
                                 "/api/gas/near",
                                 "/api/gas/cheapest",
+                                "/api/gas/trend",
                                 "/api/service-requests/important/near",
                                 "/api/service-requests/near"
                         ).authenticated()

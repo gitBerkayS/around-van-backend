@@ -9,10 +9,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.HexFormat;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -25,8 +28,11 @@ public class GasImportService {
             "(?i)([^\\s,])((?:North |West )?Vancouver|Burnaby|Richmond|Coquitlam|Port Moody|Port Coquitlam),\\s*BC"
     );
 
+    private static final ZoneId VANCOUVER_ZONE = ZoneId.of("America/Vancouver");
+
     private final GasStationRepository gasStationRepository;
     private final GasPriceRepository gasPriceRepository;
+    private final GasPriceDailyRepository gasPriceDailyRepository;
     private final LocationService locationService;
     private final NominatimClient nominatimClient;
 
@@ -93,10 +99,34 @@ public class GasImportService {
             price.setObservedAt(syncedAt);
 
             gasPriceRepository.save(price);
+            upsertDailyPrice(station, request.fuelType(), stationData.price(), syncedAt);
             imported++;
         }
 
         return new GasImportResult(imported, skipped);
+    }
+
+    private void upsertDailyPrice(
+            GasStation station,
+            FuelType fuelType,
+            BigDecimal priceValue,
+            Instant observedAt
+    ) {
+        LocalDate priceDate = observedAt.atZone(VANCOUVER_ZONE).toLocalDate();
+
+        GasPriceDaily daily = gasPriceDailyRepository
+                .findByStationIdAndFuelTypeAndPriceDate(station.getId(), fuelType, priceDate)
+                .orElseGet(() -> {
+                    GasPriceDaily created = new GasPriceDaily();
+                    created.setStation(station);
+                    created.setFuelType(fuelType);
+                    created.setPriceDate(priceDate);
+                    return created;
+                });
+
+        daily.setPrice(priceValue);
+        daily.setObservedAt(observedAt);
+        gasPriceDailyRepository.save(daily);
     }
 
     static String normalizeAddress(String address) {
